@@ -1,0 +1,222 @@
+SQL> @A08_chan.sql
+SQL> set echo on
+SQL> set feedback 1
+SQL> set pagesize 999
+SQL> set trimspool on
+SQL> set linesize 200
+SQL> set tab off
+SQL> clear columns
+SQL> 
+SQL> 
+SQL> /* Ho Yeung Chan */
+SQL> 
+SQL> /*  TASK  */
+SQL> select user, sysdate
+  2  FROM dual;
+
+USER                           SYSDATE
+------------------------------ ---------
+HCHAN80                        30-OCT-17
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 1 */
+SQL> CREATE OR REPLACE VIEW bkOrdersPriorYear
+  2  AS (
+  3          SELECT DISTINCT
+  4          cust_id AS CUSTOMERID
+  5          , TO_CHAR(order_date, 'MON') AS ORDERMONTH
+  6          , CASE
+  7                  WHEN (cust_name_first IS NULL AND cust_name_last IS NOT NULL) THEN cust_name_last
+  8                  WHEN (cust_name_first IS NOT NULL AND cust_name_last IS NULL) THEN cust_name_first
+  9                  ELSE cust_name_last ||', '|| cust_name_first
+ 10          END AS CUSTOMERNAME
+ 11          FROM bk_order_headers
+ 12          JOIN bk_customers USING (cust_id)
+ 13          WHERE EXTRACT(year FROM order_date) = EXTRACT(year FROM SYSDATE)-1
+ 14  );
+
+View created.
+
+SQL> 
+SQL> /*  TASK 2  */
+SQL> SELECT CUSTOMERID
+  2  , CUSTOMERNAME
+  3  FROM bkOrdersPriorYear
+  4  WHERE ORDERMONTH = 'MAR'
+  5  INTERSECT
+  6  SELECT CUSTOMERID
+  7  , CUSTOMERNAME
+  8  FROM bkOrdersPriorYear
+  9  WHERE ORDERMONTH = 'JUN'
+ 10  INTERSECT
+ 11  SELECT CUSTOMERID
+ 12  , CUSTOMERNAME
+ 13  FROM bkOrdersPriorYear
+ 14  WHERE ORDERMONTH = 'SEP'
+ 15  ;
+
+no rows selected
+
+SQL> 
+SQL> /*  TASK 3 */
+SQL> SELECT CUSTOMERID
+  2  , CUSTOMERNAME
+  3  FROM bkOrdersPriorYear
+  4  WHERE ORDERMONTH= 'APR'
+  5  UNION
+  6  SELECT CUSTOMERID
+  7  , CUSTOMERNAME
+  8  FROM bkOrdersPriorYear
+  9  WHERE ORDERMONTH= 'JUN'
+ 10  UNION
+ 11  SELECT CUSTOMERID
+ 12  , CUSTOMERNAME
+ 13  FROM bkOrdersPriorYear
+ 14  WHERE ORDERMONTH= 'AUG'
+ 15  ;
+
+CUSTOMERID CUSTOMERNAME
+---------- ------------------------------------------
+    200368 Blake, William
+    222477 Rossetti, Christina
+    227105 Kafka, Franz
+    259906 Capybara, Wile E.
+    261502 Hawthorne, Nathaniel
+    267780 Shelly, Mary
+    272787 Carlson, Ben
+    282716 Biederbecke, Dwight
+    290298 Swift, Jonathan
+
+9 rows selected.
+
+SQL> 
+SQL> 
+SQL> /*  TASK 4 */
+SQL> (SELECT CUSTOMERID
+  2  , CUSTOMERNAME
+  3  FROM bkOrdersPriorYear
+  4  WHERE ORDERMONTH= 'APR'
+  5  INTERSECT
+  6  SELECT CUSTOMERID
+  7  , CUSTOMERNAME
+  8  FROM bkOrdersPriorYear
+  9  WHERE ORDERMONTH= 'MAY')
+ 10  MINUS
+ 11  SELECT CUSTOMERID
+ 12  , CUSTOMERNAME
+ 13  FROM bkOrdersPriorYear
+ 14  WHERE ORDERMONTH= 'JUN'
+ 15  ;
+
+CUSTOMERID CUSTOMERNAME
+---------- ------------------------------------------
+    222477 Rossetti, Christina
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 5 */
+SQL> (SELECT CUSTOMERID
+  2  , CUSTOMERNAME
+  3  FROM bkOrdersPriorYear
+  4  WHERE ORDERMONTH= 'MAR'
+  5  UNION
+  6  SELECT CUSTOMERID
+  7  , CUSTOMERNAME
+  8  FROM bkOrdersPriorYear
+  9  WHERE ORDERMONTH= 'JUN')
+ 10  MINUS
+ 11  SELECT CUSTOMERID
+ 12  , CUSTOMERNAME
+ 13  FROM bkOrdersPriorYear
+ 14  WHERE ORDERMONTH= 'SEP'
+ 15  ;
+
+CUSTOMERID CUSTOMERNAME
+---------- ------------------------------------------
+    200368 Blake, William
+    208950 Adams, Samuel
+    212921 Books on Tap
+    217796 Anders
+    218709 Bonnard, Paul
+    221297 Dodgson, Charles
+    222477 Rossetti, Christina
+    224038 Austin, Pat
+    227105 Kafka, Franz
+    234138 Keats, John
+    234709 Brahms, Johnnie
+    239427 Marksa, Anna
+    260368 Muller, Jonathan
+    261502 Hawthorne, Nathaniel
+    263119 Jones
+    267780 Shelly, Mary
+    272611 Jarrett, Keith
+    272787 Carlson, Ben
+    276381 Collins, Douglas
+    290298 Swift, Jonathan
+
+20 rows selected.
+
+SQL> 
+SQL> /*  TASK 6 */
+SQL> SELECT CUSTOMERID
+  2  , CUSTOMERNAME
+  3  FROM bkOrdersPriorYear
+  4  MINUS
+  5  SELECT CUSTOMERID
+  6  , CUSTOMERNAME
+  7  FROM bkOrdersPriorYear
+  8  WHERE ORDERMONTH = 'MAR'
+  9  MINUS
+ 10  SELECT CUSTOMERID
+ 11  , CUSTOMERNAME
+ 12  FROM bkOrdersPriorYear
+ 13  WHERE ORDERMONTH = 'JUN'
+ 14  MINUS
+ 15  SELECT CUSTOMERID
+ 16  , CUSTOMERNAME
+ 17  FROM bkOrdersPriorYear
+ 18  WHERE ORDERMONTH = 'SEP'
+ 19  ;
+
+CUSTOMERID CUSTOMERNAME
+---------- ------------------------------------------
+    228175 Cardin, Benjamin
+    259906 Capybara, Wile E.
+    259969 Carlsen, Benny
+    282716 Biederbecke, Dwight
+    299099 Sam, Dave
+
+5 rows selected.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> /*  TASK 7 */
+SQL> SELECT CUSTOMERID
+  2  , CUSTOMERNAME
+  3  FROM bkOrdersPriorYear
+  4  WHERE ORDERMONTH= 'JAN'
+  5  MINUS
+  6  SELECT CUSTOMERID
+  7  , CUSTOMERNAME
+  8  FROM bkOrdersPriorYear
+  9  WHERE ORDERMONTH = 'FEB'
+ 10  MINUS
+ 11  SELECT CUSTOMERID
+ 12  , CUSTOMERNAME
+ 13  FROM bkOrdersPriorYear
+ 14  WHERE ORDERMONTH = 'MAR'
+ 15  ;
+
+CUSTOMERID CUSTOMERNAME
+---------- ------------------------------------------
+    259969 Carlsen, Benny
+
+1 row selected.
+
+SQL> 
+SQL> 
+SQL> spool off
