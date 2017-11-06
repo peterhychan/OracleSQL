@@ -1,0 +1,252 @@
+SQL> @A09_chan.sql
+SQL> set feedback 1
+SQL> set pagesize 999
+SQL> set trimspool on
+SQL> set linesize 200
+SQL> set tab off
+SQL> clear columns
+SQL> 
+SQL> 
+SQL> /* Ho Yeung Chan */
+SQL> 
+SQL> /*  TASK 00 */
+SQL> select user, sysdate
+  2  from dual;
+
+USER                           SYSDATE
+------------------------------ ---------
+HCHAN80                        05-NOV-17
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 01 */
+SQL> SELECT SUM(quantity * order_price) AS AMTDUE
+  2  FROM bk_order_details
+  3  WHERE book_id = '1108'
+  4  ;
+
+    AMTDUE
+----------
+  31466.85
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 02  */
+SQL> SELECT COUNT(order_id) AS NUMBEROFORDERS
+  2  FROM bk_order_details
+  3  JOIN bk_order_headers USING (order_id)
+  4  WHERE book_id = '1108'
+  5  AND EXTRACT(year FROM order_date) = EXTRACT(year FROM sysdate)-1
+  6  ;
+
+NUMBEROFORDERS
+--------------
+             2
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 03 */
+SQL> SELECT cust_id AS CUSTID
+  2  , cust_name_last AS CUSTNAME
+  3  , COALESCE( TO_CHAR( SUM( quantity ) ), 'NULL' ) AS BOOKTOTAL
+  4  , COALESCE( TO_CHAR( SUM(
+  5        CASE WHEN EXTRACT( YEAR FROM sysdate ) =EXTRACT( YEAR FROM order_date )
+  6        THEN quantity ELSE NULL  END ) ), 'NULL' ) AS CURRENTYEARBOOKTOTAL
+  7  FROM bk_customers
+  8  LEFT JOIN bk_order_headers USING (cust_id)
+  9  LEFT JOIN bk_order_details USING (order_id)
+ 10  GROUP BY cust_id, cust_name_last
+ 11  ;
+
+    CUSTID CUSTNAME             BOOKTOTAL                                CURRENTYEARBOOKTOTAL
+---------- -------------------- ---------------------------------------- ----------------------------------------
+    221297 Dodgson              143                                      37
+    239427 Marksa               485                                      NULL
+    272611 Jarrett              15                                       NULL
+    211483 Carroll              1315                                     682
+    224038 Austin               111                                      NULL
+    228352 Edwards              NULL                                     NULL
+    228275 Mikulski             NULL                                     NULL
+    217002 Grieg                1292                                     1118
+    226656 Randall              291                                      NULL
+    222477 Rossetti             145                                      NULL
+    267780 Shelly               750                                      NULL
+    234138 Keats                190                                      NULL
+    261502 Hawthorne            1004                                     NULL
+    259969 Carlsen              16                                       NULL
+    255919 Milton               NULL                                     NULL
+    259907 Hedge                NULL                                     NULL
+    217796 Anders               1551                                     1072
+    202958 Denver               1215                                     1041
+    227105 Kafka                2572                                     NULL
+    282716 Biederbecke          1277                                     NULL
+    259906 Capybara             747                                      NULL
+    258595 Jobs                 4                                        NULL
+    218709 Bonnard              1314                                     779
+    226275 Dalrymple            NULL                                     NULL
+    208950 Adams                1053                                     994
+    276381 Collins              205                                      NULL
+    260368 Muller               17                                       NULL
+    272787 Carlson              621                                      NULL
+    200368 Blake                1493                                     376
+    296598 Collins              2                                        NULL
+    299099 Sam                  351                                      NULL
+    287261 Biederbecke          NULL                                     NULL
+    212921 Books on Tap         970                                      535
+    290298 Swift                629                                      NULL
+    228175 Cardin               17                                       NULL
+    263119 Jones                606                                      NULL
+    234709 Brahms               69                                       NULL
+
+37 rows selected.
+
+SQL> 
+SQL> 
+SQL> /*  TASK 04 */
+SQL> SELECT COUNT(order_id) AS NUMBEROFORDERS
+  2  , COUNT(CASE WHEN quantity >0 THEN cust_id ELSE NULL END) AS NUM_OVER_ONE_ORDER
+  3  FROM bk_order_headers
+  4  JOIN bk_order_details USING (order_id)
+  5  WHERE to_char(order_date,'q') = to_char(add_months(sysdate,-3),'q')
+  6  ;
+
+NUMBEROFORDERS NUM_OVER_ONE_ORDER
+-------------- ------------------
+           261                261
+
+1 row selected.
+
+SQL> 
+SQL> /* TASK 05 */
+SQL> SELECT book_id
+  2  , title
+  3  FROM bk_books
+  4  WHERE book_id =(
+  5          SELECT STATS_MODE(order_id) AS ORDER_MODE
+  6          FROM bk_order_details
+  7          JOIN bk_books USING (book_id)
+  8          JOIN bk_book_topics USING (book_id)
+  9          WHERE topic_id IN ('NOSQL', 'XML','DB')
+ 10          AND book_id=(
+ 11                  SELECT STATS_MODE(order_id) AS ORDER_MODE
+ 12                  FROM bk_order_details
+ 13                  JOIN bk_books USING (book_id)
+ 14                  JOIN bk_book_topics USING (book_id)
+ 15                  WHERE topic_id IN ('NOSQL', 'XML','DB')
+ 16          ))
+ 17  ;
+
+no rows selected
+
+SQL> 
+SQL> /*  TASK 06 */
+SQL> SELECT
+  2  COUNT(CASE WHEN topic_id= 'SCI'
+  3          THEN book_id ELSE NULL END) AS SCIENCE
+  4  ,COUNT(CASE WHEN topic_id IN ('DB','SQL','SSRV','MySQL','ORA','ADO')
+  5          THEN book_id ELSE NULL END) AS DATABASE_SYSTEMS
+  6  ,COUNT(CASE WHEN topic_id IN('NOSQL', 'XML','DB')
+  7          THEN book_id ELSE NULL END) AS DATA_STORAGE_TECHNIQUES
+  8  ,COUNT(book_id) AS ALL_BOOKS
+  9  FROM bk_book_topics
+ 10  ;
+
+   SCIENCE DATABASE_SYSTEMS DATA_STORAGE_TECHNIQUES  ALL_BOOKS
+---------- ---------------- ----------------------- ----------
+        22               49                      12        120
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 07 */
+SQL> SELECT cust_id AS CUSTID
+  2  , cust_name_last AS CUSTOMER
+  3  , COALESCE(MAX(TO_CHAR(order_date,'YYYY-MM-DD')), 'No Orders') AS MOSTRECENT
+  4  FROM bk_customers
+  5  LEFT JOIN bk_order_headers USING (cust_id)
+  6  GROUP BY cust_id, cust_name_last
+  7  ;
+
+    CUSTID CUSTOMER             MOSTRECENT
+---------- -------------------- ----------
+    221297 Dodgson              2017-10-22
+    239427 Marksa               2016-03-31
+    272611 Jarrett              2016-03-10
+    224038 Austin               2016-03-23
+    211483 Carroll              2017-12-27
+    228275 Mikulski             No Orders
+    228352 Edwards              No Orders
+    226656 Randall              2015-08-25
+    222477 Rossetti             2016-08-12
+    267780 Shelly               2016-08-11
+    234138 Keats                2016-03-08
+    261502 Hawthorne            2016-06-29
+    259969 Carlsen              2016-01-08
+    217002 Grieg                2017-12-26
+    259907 Hedge                No Orders
+    255919 Milton               No Orders
+    227105 Kafka                2016-06-30
+    282716 Biederbecke          2016-08-13
+    217796 Anders               2017-11-27
+    202958 Denver               2017-12-08
+    259906 Capybara             2016-04-04
+    258595 Jobs                 2015-09-20
+    218709 Bonnard              2017-10-05
+    226275 Dalrymple            No Orders
+    276381 Collins              2016-05-03
+    260368 Muller               2016-03-05
+    208950 Adams                2017-12-31
+    272787 Carlson              2016-08-13
+    200368 Blake                2017-07-20
+    296598 Collins              2015-09-20
+    299099 Sam                  2016-02-03
+    287261 Biederbecke          No Orders
+    290298 Swift                2016-07-15
+    212921 Books on Tap         2017-12-23
+    228175 Cardin               2016-02-20
+    263119 Jones                2016-03-28
+    234709 Brahms               2016-03-22
+
+37 rows selected.
+
+SQL> 
+SQL> 
+SQL> /*  TASK 08 */
+SQL> SELECT cust_id, cust_name_last
+  2  FROM bk_customers
+  3  WHERE cust_id IN(
+  4      SELECT cust_id
+  5      FROM bk_order_headers
+  6      JOIN bk_order_details USING( order_id )
+  7      JOIN bk_book_topics USING( book_id )
+  8      WHERE topic_id = 'SQL'
+  9      GROUP BY cust_id
+ 10      HAVING SUM( order_price * quantity ) > 500
+ 11  )
+ 12  AND cust_id NOT IN (
+ 13      SELECT cust_id
+ 14      FROM bk_order_details
+ 15      JOIN bk_order_headers USING( order_id )
+ 16      WHERE book_id = '1142'
+ 17  );
+
+   CUST_ID CUST_NAME_LAST
+---------- --------------------
+    234138 Keats
+    272787 Carlson
+    211483 Carroll
+    224038 Austin
+    263119 Jones
+    234709 Brahms
+    261502 Hawthorne
+    218709 Bonnard
+    239427 Marksa
+    208950 Adams
+
+10 rows selected.
+
+SQL> 
+SQL> spool off
