@@ -1,0 +1,269 @@
+SQL> @A10_chan.sql
+SQL> set feedback 1
+SQL> set pagesize 999
+SQL> set trimspool on
+SQL> set lINesize 200
+SQL> set tab off
+SQL> clear columns
+SQL> 
+SQL> 
+SQL> /* Ho Yeung Chan */
+SQL> 
+SQL> /*  Task 00 */
+SQL> SELECT user, sysdate
+  2  FROM dual;
+
+USER                           SYSDATE
+------------------------------ ---------
+HCHAN80                        06-NOV-17
+
+1 row selected.
+
+SQL> 
+SQL> /*  Task 01 */
+SQL> SELECT BOOKS.BOOK_ID
+  2  , BOOKS.TITLE
+  3  FROM BK_BOOKS BOOKS
+  4  WHERE BOOKS.BOOK_ID IN(
+  5          SELECT BOOKTOPICS.BOOK_ID
+  6          FROM BK_BOOK_TOPICS BOOKTOPICS
+  7          WHERE BOOKTOPICS.TOPIC_ID = 'DB'
+  8          OR BOOKTOPICS.TOPIC_ID = 'SQL'
+  9          )
+ 10          AND BOOKS.BOOK_ID IN(
+ 11          SELECT ORDERS.BOOK_ID
+ 12          FROM BK_ORDER_DETAILS ORDERS
+ 13          )
+ 14          ORDER BY BOOKS.BOOK_ID
+ 15  ;
+
+   BOOK_ID TITLE
+---------- ---------------------------------------------------------------------------
+      1105 SQL:1999 Relational Language Concepts
+      1106 SQL for Smarties
+      1107 SQL Puzzles and Answers
+      1108 Database Systems
+      1109 Intro to DB Systems-7th Ed
+      1110 Adv SQL:1999 Object_Relational Features
+      1128 Temporal Data and the Relational Model
+      1142 Relational Database Theory
+      1161 SQL Programming Style
+      1162 Trees and Hierarchies
+      1175 MySQL in a Nutshell
+      1180 MySQL Database Design and Tuning
+      1182 MySQL Cookbook
+      1184 MySQL Developer's Library
+      1185 MySQL Stored Procedures
+      1188 SQL for MySQL Developers
+      1245 A Scientific Approach to SQL Testing
+      1278 Beginning VB 2008 Databases
+      1306 Myths of SQL
+      1483 Programming with XML
+      2002 SQL Server 2012 A Beginner's Guide
+      2006 T_SQL Programming (Inside series)
+      2007 T_SQL Querying (Inside series)
+      2008 SQL Server T_Sql Recipies
+      2018 Oracle Database 11g SQL
+      2025 Oracle SQL Fundamentals I Exam Guide
+      2032 Oracle and the rest of the world
+
+27 rows selected.
+
+SQL> 
+SQL> /*  Task 02  */
+SQL> SELECT BOOKS.BOOK_ID
+  2  , BOOKS.TITLE
+  3  FROM BK_BOOKS BOOKS
+  4  WHERE BOOKS.BOOK_ID IN
+  5                  (SELECT BOOKTOPICS.BOOK_ID
+  6                  FROM BK_BOOK_TOPICS BOOKTOPICS
+  7                  WHERE BOOKTOPICS.TOPIC_ID = 'DB')
+  8                  AND BOOKS.BOOK_ID IN
+  9                  (SELECT BOOKTOPICS.BOOK_ID
+ 10                  FROM BK_BOOK_TOPICS BOOKTOPICS
+ 11                  WHERE BOOKTOPICS.TOPIC_ID = 'SQL'
+ 12                  )
+ 13                  AND BOOKS.BOOK_ID IN
+ 14                  (SELECT ORDERS.BOOK_ID
+ 15                  FROM BK_ORDER_DETAILS ORDERS
+ 16                  )
+ 17  ORDER BY BOOKS.BOOK_ID
+ 18  ;
+
+   BOOK_ID TITLE
+---------- ---------------------------------------------------------------------------
+      1105 SQL:1999 Relational Language Concepts
+      1110 Adv SQL:1999 Object_Relational Features
+      1128 Temporal Data and the Relational Model
+      1245 A Scientific Approach to SQL Testing
+
+4 rows selected.
+
+SQL> 
+SQL> /*  Task 03 */
+SQL> SELECT BOOKS.BOOK_ID
+  2  , BOOKS.TITLE
+  3  FROM BK_BOOKS BOOKS
+  4  WHERE BOOKS.BOOK_ID IN(
+  5                  SELECT BOOKTOPICS.BOOK_ID
+  6                  FROM BK_BOOK_TOPICS BOOKTOPICS
+  7                  WHERE BOOKTOPICS.TOPIC_ID = 'SQL'
+  8                  )
+  9                  AND BOOKS.BOOK_ID NOT IN(
+ 10                  SELECT BOOKTOPICS.BOOK_ID
+ 11                  FROM BK_BOOK_TOPICS BOOKTOPICS
+ 12                  WHERE BOOKTOPICS.TOPIC_ID = 'DB'
+ 13                  )
+ 14                  AND BOOKS.BOOK_ID IN(
+ 15                  SELECT ORDERS.BOOK_ID
+ 16                  FROM BK_ORDER_DETAILS ORDERS
+ 17                  )
+ 18  ORDER BY BOOKS.BOOK_ID
+ 19  ;
+
+   BOOK_ID TITLE
+---------- ---------------------------------------------------------------------------
+      1106 SQL for Smarties
+      1107 SQL Puzzles and Answers
+      1161 SQL Programming Style
+      1162 Trees and Hierarchies
+      1175 MySQL in a Nutshell
+      1182 MySQL Cookbook
+      1184 MySQL Developer's Library
+      1185 MySQL Stored Procedures
+      1188 SQL for MySQL Developers
+      1306 Myths of SQL
+      1483 Programming with XML
+      2002 SQL Server 2012 A Beginner's Guide
+      2006 T_SQL Programming (Inside series)
+      2007 T_SQL Querying (Inside series)
+      2008 SQL Server T_Sql Recipies
+      2018 Oracle Database 11g SQL
+      2025 Oracle SQL Fundamentals I Exam Guide
+
+17 rows selected.
+
+SQL> 
+SQL> 
+SQL> /*  Task 04 */
+SQL> SELECT CUS.CUST_ID
+  2  , CUS.CUST_NAME_LAST
+  3  FROM BK_CUSTOMERS CUS
+  4  WHERE CUS.CUST_ID IN(
+  5                  SELECT HEADER.CUST_ID
+  6                  FROM BK_ORDER_HEADERS HEADER
+  7                  WHERE HEADER.ORDER_ID IN(
+  8                                  SELECT ORDERS.ORDER_ID
+  9                                  FROM BK_ORDER_DETAILS ORDERS
+ 10                                  WHERE ORDERS.BOOK_ID IN(
+ 11                                                  SELECT BOOKTOPICS.BOOK_ID
+ 12                                                  FROM BK_BOOK_TOPICS BOOKTOPICS
+ 13                                                  WHERE BOOKTOPICS.TOPIC_ID = 'HIST'
+ 14                                  )))
+ 15.                 AND EXTRACT(YAER FROM ORDER_DATE) = EXTRACT(YEAR FROM SYSDATE)
+ 16  ORDER BY CUS.CUST_ID
+ 17  ;
+
+   CUST_ID CUST_NAME_LAST
+---------- --------------------
+    200368 Blake
+    202958 Denver
+    208950 Adams
+    211483 Carroll
+    212921 Books on Tap
+    217002 Grieg
+    217796 Anders
+    218709 Bonnard
+
+8 rows selected.
+
+SQL> 
+SQL> /* Task 05 */
+SQL> with BOOK_COPYSOLD AS(
+  2          SELECT ORDERS.BOOK_ID AS BOOK_ID
+  3          , SUM(NVL(ORDERS.QUANTITY, 0)) AS COPY_SOLD
+  4          FROM BK_ORDER_DETAILS ORDERS
+  5          GROUP BY ORDERS.BOOK_ID
+  6          )
+  7  SELECT BOOKS.BOOK_ID
+  8  , BOOKS.TITLE
+  9  FROM BK_BOOKS BOOKS
+ 10  WHERE BOOKS.BOOK_ID IN(
+ 11          SELECT SOLD.BOOK_ID
+ 12          FROM BOOK_COPYSOLD SOLD
+ 13          WHERE SOLD.COPY_SOLD > 500
+ 14          )
+ 15  ORDER BY BOOKS.BOOK_ID
+ 16  ;
+
+   BOOK_ID TITLE
+---------- ---------------------------------------------------------------------------
+      1103 Selected Poems
+      1107 SQL Puzzles and Answers
+      1108 Database Systems
+      1128 Temporal Data and the Relational Model
+      1142 Relational Database Theory
+      1305 Journeys Through Flatland
+      1401 Visual Studio Tools for Office
+      1448 Backyard Birdsong Guide: Western North America
+      1602 Goblin Market and Other Poems
+      2002 SQL Server 2012 A Beginner's Guide
+      2025 Oracle SQL Fundamentals I Exam Guide
+      2623 Hornworts and Liverworts in your Garden
+
+12 rows selected.
+
+SQL> 
+SQL> /*  Task 06 */
+SQL> with ORDER_STATISTICS AS(
+  2          SELECT OYM.YEAR_MONTH
+  3          , count(OYM.ORDER_ID) AS NUM_OF_ORDERS
+  4          FROM(
+  5                  SELECT HEADER.ORDER_ID
+  6                  , TO_CHAR(HEADER.ORDER_DATE, 'YYYY') || '.' || TO_CHAR(HEADER.ORDER_DATE, 'MM') AS YEAR_MONTH
+  7                  FROM BK_ORDER_HEADERS HEADER)
+  8                  OYM
+  9          GROUP BY OYM.YEAR_MONTH)
+ 10  SELECT ORDERS.YEAR_MONTH
+ 11  FROM ORDER_STATISTICS ORDERS
+ 12  WHERE ORDERS.NUM_OF_ORDERS = (
+ 13          SELECT MIN(NUM_OF_ORDERS)
+ 14          FROM ORDER_STATISTICS)
+ 15  ORDER BY ORDERS.YEAR_MONTH DESC
+ 16  ;
+
+YEAR_MO
+-------
+2016.07
+2015.04
+
+2 rows selected.
+
+SQL> 
+SQL> /*  Task 07 */
+SQL> with ORDER_STATISTICS AS(
+  2          SELECT OYM.YEAR_MONTH
+  3          , COUNT(OYM.ORDER_ID) AS NUM_OF_ORDERS
+  4          FROM(
+  5                  SELECT ORH.ORDER_ID
+  6                  , TO_CHAR(ORH.ORDER_DATE, 'YYYY') || '.' || TO_CHAR(ORH.ORDER_DATE, 'MM') AS YEAR_MONTH
+  7                  FROM BK_ORDER_HEADERS ORH)
+  8                  OYM
+  9                  GROUP BY OYM.YEAR_MONTH)
+ 10  SELECT ORDERS.YEAR_MONTH
+ 11  FROM ORDER_STATISTICS ORDERS
+ 12  WHERE ORDERS.NUM_OF_ORDERS = (
+ 13                  SELECT MAX(NUM_OF_ORDERS)
+ 14                  FROM ORDER_STATISTICS
+ 15                  )
+ 16  ORDER BY ORDERS.YEAR_MONTH DESC
+ 17  ;
+
+YEAR_MO
+-------
+2016.03
+
+1 row selected.
+
+SQL> 
+SQL> spool off
