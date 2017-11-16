@@ -1,0 +1,392 @@
+SQL> @A11_chan.sql
+SQL> set feedback 1
+SQL> set pagesize 999
+SQL> set trimspool on
+SQL> set lINesize 200
+SQL> set tab off
+SQL> clear columns
+SQL> 
+SQL> 
+SQL> /* Ho Yeung Chan */
+SQL> 
+SQL> /*  TASK 00 */
+SQL> SELECT user, sysdate
+  2  FROM dual;
+
+USER                           SYSDATE
+------------------------------ ---------
+HCHAN80                        16-NOV-17
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 01 */
+SQL> SELECT CUS.CUST_ID AS "Cust_ID"
+  2  , CUS.CUST_NAME_LAST AS "Cust_Name_Last"
+  3  , COALESCE((SELECT count(ORH.ORDER_ID)
+  4            FROM BK_ORDER_HEADERS ORH
+  5            WHERE CUS.CUST_ID = ORH.CUST_ID),0) AS "Number Of Orders"
+  6  FROM BK_CUSTOMERS CUS
+  7  WHERE CUS.CUST_STATE IN ('NJ', 'MA')
+  8  ;
+
+   Cust_ID Cust_Name_Last       Number Of Orders
+---------- -------------------- ----------------
+    208950 Adams                              20
+    258595 Jobs                                2
+    255919 Milton                              0
+    261502 Hawthorne                          25
+    259969 Carlsen                             4
+    239427 Marksa                             12
+    226656 Randall                             3
+    227105 Kafka                              22
+    218709 Bonnard                            39
+    234709 Brahms                              3
+
+10 rows selected.
+
+SQL> 
+SQL> /*  TASK 02  */
+SQL> 
+SQL> SELECT BOOK_ID
+  2  , TITLE
+  3  FROM BK_BOOKS
+  4  WHERE LIST_PRICE > (
+  5          SELECT AVG(LIST_PRICE)*2
+  6          FROM BK_BOOKS
+  7          )
+  8  AND BOOK_ID IN (
+  9          SELECT BOOK_ID
+ 10          FROM BK_ORDER_DETAILS
+ 11          WHERE QUANTITY >0
+ 12          )
+ 13  ;
+
+   BOOK_ID TITLE
+---------- ---------------------------------------------------------------------------
+      1142 Relational Database Theory
+      1306 Myths of SQL
+      1627 The Ants
+      1978 Acoustic Communication in Birds Vol1
+
+4 rows selected.
+
+SQL> 
+SQL> /*  TASK 03 */
+SQL> SELECT
+  2  SUM(CASE WHEN TO_CHAR(ORDER_DATE , 'Q') ='1'
+  3          THEN 1 ELSE 0 END) AS "Qrt1"
+  4  ,SUM(CASE WHEN TO_CHAR(ORDER_DATE , 'Q') ='2'
+  5          THEN 1 ELSE 0 END) AS "Qrt2"
+  6  ,SUM(CASE WHEN TO_CHAR(ORDER_DATE , 'Q') ='3'
+  7          THEN 1 ELSE 0 END) AS "Qrt3"
+  8  ,SUM(CASE WHEN TO_CHAR(ORDER_DATE , 'Q') ='4'
+  9          THEN 1 ELSE 0 END) AS "Qrt4"
+ 10  ,COUNT(ORDER_ID) AS "AllQuarters"
+ 11  FROM BK_ORDER_HEADERS
+ 12  WHERE EXTRACT(YEAR FROM ORDER_DATE)= EXTRACT(YEAR FROM SYSDATE)-1
+ 13  ;
+
+      Qrt1       Qrt2       Qrt3       Qrt4 AllQuarters
+---------- ---------- ---------- ---------- -----------
+        85         21         24         34         164
+
+1 row selected.
+
+SQL> 
+SQL> 
+SQL> /*  TASK 04 */
+SQL> SELECT CUS.CUST_ID AS "Cust_ID"
+  2  , CUS.CUST_NAME_LAST AS "Cust_Name_LASt"
+  3  FROM BK_CUSTOMERS CUS
+  4  WHERE EXISTS (
+  5          SELECT 1
+  6          FROM BK_ORDER_HEADERS ORH
+  7          WHERE ORH.CUST_ID = CUS.CUST_ID
+  8          AND TO_CHAR(ORH.ORDER_DATE, 'YYYY/MM') = (TO_CHAR(sysdate, 'YYYY') || '/01')
+  9          )
+ 10  AND EXISTS (
+ 11          SELECT 2
+ 12          FROM BK_ORDER_HEADERS ORH
+ 13          WHERE ORH.CUST_ID = CUS.CUST_ID
+ 14          AND TO_CHAR(ORH.ORDER_DATE, 'YYYY/MM') = (TO_CHAR(sysdate, 'YYYY') || '/02')
+ 15          )
+ 16  AND EXISTS (
+ 17          SELECT 3
+ 18          FROM BK_ORDER_HEADERS ORH
+ 19          WHERE ORH.CUST_ID = CUS.CUST_ID
+ 20          AND TO_CHAR(ORH.ORDER_DATE, 'YYYY/MM') = (TO_CHAR(sysdate, 'YYYY') || '/03')
+ 21          )
+ 22  ORDER BY CUS.CUST_ID
+ 23  ;
+
+   Cust_ID Cust_Name_LASt
+---------- --------------------
+    200368 Blake
+    211483 Carroll
+    218709 Bonnard
+
+3 rows selected.
+
+SQL> 
+SQL> /*  TASK 05 */
+SQL> WITH AUTHOR_BOOKS AS(
+  2          SELECT TMP.AUTHOR_ID
+  3          , (SELECT AUT.AUTHOR_NAME_FIRST
+  4          FROM BK_AUTHORS AUT
+  5          WHERE AUT.AUTHOR_ID = TMP.AUTHOR_ID) AS AUTHOR_NAME_FIRST
+  6          , (SELECT AUT.AUTHOR_NAME_LAST
+  7          FROM BK_AUTHORS AUT
+  8          WHERE AUT.AUTHOR_ID = TMP.AUTHOR_ID) AS AUTHOR_NAME_LAST
+  9          , Number_Of_Books
+ 10          FROM(SELECT AUTHOR_ID
+ 11                  , count(BOOK_ID) AS Number_Of_Books
+ 12                  FROM BK_BOOK_AUTHORS
+ 13                  GROUP BY AUTHOR_ID) TMP)
+ 14  SELECT AUB.AUTHOR_NAME_FIRST AS "Author_Name_First"
+ 15  , AUB.AUTHOR_NAME_LAST AS "Author_Name_LASt"
+ 16  , AUB.AUTHOR_ID AS "Author_ID"
+ 17  FROM AUTHOR_BOOKS AUB
+ 18  WHERE AUB.NUMBER_OF_BOOKS >= 2
+ 19  AND NOT EXISTS(
+ 20          SELECT 1
+ 21          FROM BK_BOOK_AUTHORS BAU
+ 22          WHERE BAU.AUTHOR_ID = AUB.AUTHOR_ID
+ 23          AND EXISTS(
+ 24                  SELECT 1
+ 25                  FROM BK_ORDER_DETAILS ORD
+ 26                  WHERE ORD.BOOK_ID = BAU.BOOK_ID))
+ 27  ORDER BY AUB.AUTHOR_ID
+ 28  ;
+
+no rows selected
+
+SQL> 
+SQL> /*  TASK 06 */
+SQL> WITH SQL_TOPIC_BOOKS AS(
+  2          SELECT TOP.BOOK_ID
+  3          , count(TOP.TOPIC_ID) AS NUMBER_OF_TOPICS
+  4          FROM BK_BOOK_TOPICS TOP
+  5          WHERE TOPIC_ID in ('SSRV', 'ORA', 'MYSQL')
+  6          GROUP BY TOP.BOOK_ID)
+  7  SELECT STB.BOOK_ID
+  8          , (SELECT BOK.TITLE
+  9          FROM BK_BOOKS BOK
+ 10          WHERE BOK.BOOK_ID = STB.BOOK_ID) AS Title
+ 11  FROM SQL_TOPIC_BOOKS STB
+ 12  WHERE STB.NUMBER_OF_TOPICS = 2
+ 13  ;
+
+   BOOK_ID TITLE
+---------- ---------------------------------------------------------------------------
+      2028 Mastering Oracle Databases
+      2031 Comparative SQL
+
+2 rows selected.
+
+SQL> 
+SQL> /*  TASK 07 */
+SQL> SELECT ORH.ORDER_DATE AS "OrderDate"
+  2  , ORH.ORDER_ID AS "Order ID"
+  3  , ORH.CUST_ID AS "Customer ID"
+  4  , (SELECT CUST_NAME_LAST
+  5     FROM BK_CUSTOMERS CUS
+  6     WHERE CUS.CUST_ID = ORH.CUST_ID) AS "Customer"
+  7  , (SELECT sum(nvl(ORD.QUANTITY, 0))
+  8     FROM BK_ORDER_DETAILS ORD
+  9     WHERE ORD.ORDER_ID = ORH.ORDER_ID) AS "NumberBooks"
+ 10  , (SELECT sum(nvl(ORD.QUANTITY, 0) * nvl(ORDER_PRICE, 0))
+ 11     FROM BK_ORDER_DETAILS ORD
+ 12     WHERE ORD.ORDER_ID = ORH.ORDER_ID) AS "OrderCost"
+ 13  FROM BK_ORDER_HEADERS ORH
+ 14  WHERE EXTRACT(YEAR FROM ORH.ORDER_DATE) = EXTRACT(YEAR FROM SYSDATE) - 1
+ 15  AND EXTRACT(month FROM ORH.ORDER_DATE)
+ 16  BETWEEN 1 AND 3
+ 17  ORDER BY ORH.ORDER_DATE
+ 18  ;
+
+OrderDate   Order ID Customer ID Customer             NumberBooks  OrderCost
+--------- ---------- ----------- -------------------- ----------- ----------
+01-JAN-16      51845      212921 Books on Tap                  41    1277.25
+01-JAN-16      31840      267780 Shelly                         2         24
+02-JAN-16      31841      272787 Carlson                       50       1250
+02-JAN-16      31850      234138 Keats                          1      40.49
+08-JAN-16      51846      234138 Keats                         32     642.68
+08-JAN-16      51859      272611 Jarrett                        2     113.94
+08-JAN-16      51858      259969 Carlsen                        6      116.7
+08-JAN-16      51860      299099 Sam                            1      55.99
+08-JAN-16      51857      259969 Carlsen                        5     185.12
+18-JAN-16       1200      212921 Books on Tap                  40     1383.9
+20-JAN-16      12005      212921 Books on Tap                   1      27.29
+01-FEB-16      51861      260368 Muller                         3     177.97
+02-FEB-16      51862      272611 Jarrett                        4     480.72
+02-FEB-16      31853      234138 Keats                         30        999
+03-FEB-16      51863      239427 Marksa                        42      837.9
+03-FEB-16      51864      299099 Sam                          349   12092.85
+04-FEB-16      51847      217796 Anders                         3      38.89
+05-FEB-16      31855      212921 Books on Tap                   1      40.49
+05-FEB-16      51848      276381 Collins                       50        888
+08-FEB-16      31852      261502 Hawthorne                      1      40.49
+08-FEB-16      19253      272787 Carlson                        3         69
+08-FEB-16      19224      218709 Bonnard                        8     441.52
+08-FEB-16      51849      218709 Bonnard                      100       2138
+12-FEB-16      91307      272787 Carlson                        3     114.99
+15-FEB-16      31860      276381 Collins                        1      40.49
+19-FEB-16      92812      260368 Muller                         1      49.95
+20-FEB-16      91013      282716 Biederbecke                  149       6794
+20-FEB-16      94802      228175 Cardin                         8     1295.6
+21-FEB-16      91014      282716 Biederbecke                   20      519.5
+22-FEB-16      92905      259906 Capybara                       1         58
+22-FEB-16      91850      261502 Hawthorne                      2      55.49
+22-FEB-16      91841      267780 Shelly                       150       3750
+28-FEB-16      94106      267780 Shelly                        10      429.5
+29-FEB-16      94299      261502 Hawthorne                      7     182.15
+01-MAR-16      44890      212921 Books on Tap                  11        165
+02-MAR-16      44803      224038 Austin                        45    2107.45
+03-MAR-16      41007      276381 Collins                       50       1250
+04-MAR-16      44804      239427 Marksa                       100     2749.5
+05-MAR-16      44891      212921 Books on Tap                   5         75
+05-MAR-16      41012      260368 Muller                         1      49.95
+06-MAR-16      44805      224038 Austin                        10     1475.6
+08-MAR-16      41002      234138 Keats                         23        581
+08-MAR-16      41003      200368 Blake                          5        225
+10-MAR-16      32892      272611 Jarrett                        5         75
+10-MAR-16       1604      217796 Anders                        40     708.75
+10-MAR-16       1008      276381 Collins                       50       2000
+10-MAR-16       1010      218709 Bonnard                       50       1250
+10-MAR-16       1011      261502 Hawthorne                      2       21.9
+10-MAR-16       1603      261502 Hawthorne                      7     252.75
+14-MAR-16       1602      217796 Anders                         3       50.9
+14-MAR-16      44606      217796 Anders                        15      474.5
+15-MAR-16      44615      261502 Hawthorne                      2         24
+15-MAR-16      44610      263119 Jones                          2         24
+15-MAR-16       1661      261502 Hawthorne                     97        194
+18-MAR-16       1004      221297 Dodgson                        2       36.5
+18-MAR-16      32896      218709 Bonnard                        1      35.99
+18-MAR-16       1027      234709 Brahms                        43    1291.57
+19-MAR-16      22821      222477 Rossetti                       1      44.99
+19-MAR-16      22820      227105 Kafka                          2      51.95
+20-MAR-16       1028      234709 Brahms                        25     966.68
+21-MAR-16      22825      267780 Shelly                         4     148.65
+21-MAR-16      31830      227105 Kafka                        103       3600
+21-MAR-16      31837      222477 Rossetti                      50     2347.5
+22-MAR-16      31885      217796 Anders                        50       1250
+22-MAR-16      31884      290298 Swift                         10     209.91
+22-MAR-16       1039      212921 Books on Tap                   3       99.9
+22-MAR-16       1030      234709 Brahms                         1      40.49
+22-MAR-16      31889      227105 Kafka                         18      910.8
+22-MAR-16      32898      261502 Hawthorne                      3         60
+22-MAR-16      32897      261502 Hawthorne                      2        100
+23-MAR-16      22806      239427 Marksa                         1         25
+23-MAR-16      22807      224038 Austin                         1      34.99
+24-MAR-16      22808      290298 Swift                          1         45
+25-MAR-16      22810      218709 Bonnard                       10     424.95
+25-MAR-16      22809      239427 Marksa                         5        225
+26-MAR-16      31866      290298 Swift                         14     287.75
+27-MAR-16      32845      227105 Kafka                          2         70
+27-MAR-16      32849      290298 Swift                        156    6383.45
+28-MAR-16       1005      290298 Swift                          6      170.9
+28-MAR-16       1040      263119 Jones                        562   21939.98
+28-MAR-16       1006      208950 Adams                         10      109.5
+29-MAR-16      32899      261502 Hawthorne                     50       1250
+29-MAR-16      32800      217796 Anders                        50       1250
+31-MAR-16      22312      239427 Marksa                       100     2704.5
+31-MAR-16      22813      239427 Marksa                         9     395.76
+
+85 rows selected.
+
+SQL> 
+SQL> 
+SQL> /*  TASK 08 */
+SQL> WITH PREVYEAR_CUSTER_ORDERS AS(
+  2          SELECT ORH.CUST_ID
+  3          , COUNT(ORH.ORDER_ID) AS NUMBER_OF_ORDERS
+  4          FROM BK_ORDER_HEADERS ORH
+  5          WHERE EXTRACT(YEAR FROM ORH.ORDER_DATE) = EXTRACT(YEAR FROM SYSDATE) - 1
+  6          GROUP BY ORH.CUST_ID)
+  7  SELECT CUS.CUST_ID
+  8  , CUS.CUST_NAME_LAST
+  9  FROM BK_CUSTOMERS CUS
+ 10  WHERE CUS.CUST_ID in(
+ 11          SELECT PCO.CUST_ID
+ 12          FROM PREVYEAR_CUSTER_ORDERS PCO
+ 13          WHERE PCO.NUMBER_OF_ORDERS BETWEEN 3 AND 5)
+ 14  ORDER BY CUS.CUST_ID
+ 15  ;
+
+   CUST_ID CUST_NAME_LAST
+---------- --------------------
+    208950 Adams
+    221297 Dodgson
+    224038 Austin
+    234138 Keats
+    234709 Brahms
+    259906 Capybara
+    260368 Muller
+    272611 Jarrett
+    272787 Carlson
+    276381 Collins
+    282716 Biederbecke
+
+11 rows selected.
+
+SQL> 
+SQL> /*  TASK 09 */
+SQL> SELECT CUST_ID
+  2  , CUST_NAME_LAST
+  3  FROM BK_CUSTOMERS
+  4  WHERE CUST_ID IN (
+  5          SELECT STATS_MODE(CUST_ID)
+  6          FROM BK_ORDER_HEADERS
+  7          WHERE EXTRACT(YEAR FROM ORDER_DATE) = EXTRACT(YEAR FROM SYSDATE)-1
+  8  );
+
+   CUST_ID CUST_NAME_LAST
+---------- --------------------
+    212921 Books on Tap
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 10 */
+SQL> WITH QUARTERLY_CUSTER_ORDERS AS(
+  2          SELECT ORH.CUST_ID
+  3          , TO_CHAR(ORH.ORDER_DATE, 'YYYY') AS YEAR
+  4          , TO_CHAR(ORH.ORDER_DATE, 'Q') AS QUARTER
+  5          , COUNT(ORH.ORDER_ID) AS NUMBER_OF_ORDERS
+  6          FROM BK_ORDER_HEADERS ORH
+  7          GROUP BY ORH.CUST_ID
+  8          , TO_CHAR(ORH.ORDER_DATE, 'YYYY')
+  9          , TO_CHAR(ORH.ORDER_DATE, 'Q'))
+ 10  SELECT CUS.CUST_ID
+ 11  , CUS.CUST_NAME_LAST
+ 12  FROM BK_CUSTOMERS CUS
+ 13  WHERE EXISTS(
+ 14          SELECT 1
+ 15          FROM QUARTERLY_CUSTER_ORDERS PYQCO
+ 16          WHERE PYQCO.YEAR = TO_CHAR(EXTRACT(YEAR FROM SYSDATE) - 1)
+ 17          AND PYQCO.QUARTER = '1'
+ 18          AND PYQCO.CUST_ID = CUS.CUST_ID
+ 19  AND EXISTS(
+ 20          SELECT 2
+ 21          FROM QUARTERLY_CUSTER_ORDERS CYQCO
+ 22          WHERE CYQCO.YEAR = TO_CHAR(SYSDATE, 'YYYY')
+ 23          AND CYQCO.QUARTER = '1'
+ 24          AND CYQCO.CUST_ID = PYQCO.CUST_ID
+ 25          AND PYQCO.NUMBER_OF_ORDERS >= PYQCO.NUMBER_OF_ORDERS))
+ 26  ORDER BY CUS.CUST_ID
+ 27  ;
+
+   CUST_ID CUST_NAME_LAST
+---------- --------------------
+    200368 Blake
+    208950 Adams
+    212921 Books on Tap
+    217796 Anders
+    218709 Bonnard
+
+5 rows selected.
+
+SQL> 
+SQL> 
+SQL> spool off
