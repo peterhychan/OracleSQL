@@ -1,4 +1,5 @@
 SQL> @A11_chan.sql
+SQL> set echo on
 SQL> set feedback 1
 SQL> set pagesize 999
 SQL> set trimspool on
@@ -15,7 +16,7 @@ SQL> SELECT user, sysdate
 
 USER                           SYSDATE
 ------------------------------ ---------
-HCHAN80                        16-NOV-17
+HCHAN80                        19-NOV-17
 
 1 row selected.
 
@@ -64,12 +65,11 @@ SQL> SELECT BOOK_ID
 
    BOOK_ID TITLE
 ---------- ---------------------------------------------------------------------------
-      1142 Relational Database Theory
       1306 Myths of SQL
       1627 The Ants
       1978 Acoustic Communication in Birds Vol1
 
-4 rows selected.
+3 rows selected.
 
 SQL> 
 SQL> /*  TASK 03 */
@@ -159,7 +159,14 @@ SQL> WITH AUTHOR_BOOKS AS(
  27  ORDER BY AUB.AUTHOR_ID
  28  ;
 
-no rows selected
+Author_Name_First    Author_Name_LASt     Autho
+-------------------- -------------------- -----
+Tim                  Birkhead             B1144
+Irwin                Brodo                B1244
+Sylvia               Sharnoff             S2144
+John                 Watson               W4512
+
+4 rows selected.
 
 SQL> 
 SQL> /*  TASK 06 */
@@ -186,7 +193,7 @@ SQL> WITH SQL_TOPIC_BOOKS AS(
 
 SQL> 
 SQL> /*  TASK 07 */
-SQL> SELECT ORH.ORDER_DATE AS "OrderDate"
+SQL> SELECT ORH.ORDER_DATE AS "Order Date"
   2  , ORH.ORDER_ID AS "Order ID"
   3  , ORH.CUST_ID AS "Customer ID"
   4  , (SELECT CUST_NAME_LAST
@@ -205,7 +212,7 @@ SQL> SELECT ORH.ORDER_DATE AS "OrderDate"
  17  ORDER BY ORH.ORDER_DATE
  18  ;
 
-OrderDate   Order ID Customer ID Customer             NumberBooks  OrderCost
+Order Dat   Order ID Customer ID Customer             NumberBooks  OrderCost
 --------- ---------- ----------- -------------------- ----------- ----------
 01-JAN-16      51845      212921 Books on Tap                  41    1277.25
 01-JAN-16      31840      267780 Shelly                         2         24
