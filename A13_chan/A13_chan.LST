@@ -1,0 +1,427 @@
+SQL> @A13_chan.sql
+SQL> set echo on
+SQL> set feedback 1
+SQL> set pagesize 999
+SQL> set trimspool on
+SQL> set lINesize 200
+SQL> set tab off
+SQL> clear columns
+SQL> 
+SQL> set Long 999999
+SQL> 
+SQL> column BookID format A10
+SQL> column Title format A35
+SQL> column Price format 9,990.00
+SQL> column AuthorList format A50
+SQL> column Subject format A15
+SQL> column AvgPrice format 9,990.00
+SQL> 
+SQL> /* Ho Yeung Chan */
+SQL> 
+SQL> /*  TASK 00 */
+SQL> SELECT user, sysdate
+  2  FROM dual;
+
+USER                           SYSDATE
+------------------------------ ---------
+HCHAN80                        02-DEC-17
+
+1 row selected.
+
+SQL> 
+SQL> /*  TASK 01 */
+SQL> with XML_Table as
+  2          (select extractvalue(OBJECT_VALUE, '/book/bk_id') as BookID
+  3          , extractvalue(OBJECT_VALUE, '/book/bk_title') as Title
+  4          , extractvalue(OBJECT_VALUE, '/book/bk_price') as Price
+  5          , extractvalue(OBJECT_VALUE, '/book/bk_subject') as Subject
+  6          from xml_A13_books)
+  7  select BookID as "BookID"
+  8  , Title as "Title"
+  9  , cast(Price as number) as "Price"
+ 10  , Subject as "Subject"
+ 11  from XML_Table
+ 12  ;
+
+BookID     Title                                   Price Subject
+---------- ----------------------------------- --------- ---------------
+101        The Art Of SQL                          44.99 Fiction
+110        Summer Cometh                            0.00 Fiction
+102        Oracle SQL and SQL*Plus                 65.00 Tech
+106        Alice in Oracle Land                    35.00 Fiction
+107        Crows and Ravens                        25.15 Science
+103        XML Schema                              25.00 Fiction
+104        Programming with T-SQL                  50.00 Tech
+105        Thinking in Sets                        45.99 SQL
+184        Birds of a Feather                      69.99 Fiction
+108        T-SQL Programming                       29.95 Tech
+115        Logic for Understanding Databases        5.00 Tech
+987        XML 15 the Textbook                    135.00 XML
+1010       Promises                                      Science
+1256       Priceless                                     Fantasy
+188        Pricy                                  135.00 Fiction
+
+15 rows selected.
+
+SQL> 
+SQL> /*  TASK 02  */
+SQL> with XML_Table as
+  2          (select extractvalue(OBJECT_VALUE, '/book/bk_id') as BookID
+  3          , extractvalue(OBJECT_VALUE, '/book/bk_title') as Title
+  4          , extractvalue(OBJECT_VALUE, '/book/bk_price') as Price
+  5          , extractvalue(OBJECT_VALUE, '/book/bk_subject') as Subject
+  6          , extract(OBJECT_VALUE, '/book/bk_authors') as AuthorList
+  7          from xml_A13_books)
+  8  select BookID as "BookID"
+  9  , Title as "Title"
+ 10  , cast(Price as number) as "Price"
+ 11  , AuthorList as "AuthorList"
+ 12  from XML_Table
+ 13  where Price >= 30
+ 14  and Subject = 'Fiction'
+ 15  ;
+
+BookID     Title                                   Price AuthorList
+---------- ----------------------------------- --------- --------------------------------------------------
+101        The Art Of SQL                          44.99 <bk_authors>
+                                                           <author>Faroult</author>
+                                                         </bk_authors>
+
+106        Alice in Oracle Land                    35.00 <bk_authors>
+                                                           <author>Dodgson</author>
+                                                           <author>Martin</author>
+                                                           <author>Carroll</author>
+                                                         </bk_authors>
+
+184        Birds of a Feather                      69.99 <bk_authors>
+                                                           <author>Heinrich</author>
+                                                         </bk_authors>
+
+188        Pricy                                  135.00 <bk_authors>
+                                                           <author>Martin</author>
+                                                         </bk_authors>
+
+
+4 rows selected.
+
+SQL> 
+SQL> /*  TASK 03 */
+SQL> with XML_Table as
+  2          (select extractvalue(OBJECT_VALUE, '/book/bk_id') as BookID
+  3          , extractvalue(OBJECT_VALUE, '/book/bk_title') as Title
+  4          , extractvalue(OBJECT_VALUE, '/book/bk_subject') as Subject
+  5          , extractvalue(OBJECT_VALUE, '/book/bk_price') as Price
+  6          , extract(OBJECT_VALUE, '/book/bk_authors') as AuthorList
+  7          from xml_A13_books
+  8          where existsnode(OBJECT_VALUE, '/book [bk_price > 30]') = 1
+  9          and existsnode(OBJECT_VALUE, '/book [bk_subject="Fiction"]') = 1)
+ 10  select BookID as "BookID"
+ 11  , Title as "Title"
+ 12  , cast(Price as number) as "Price"
+ 13  , AuthorList as "AuthorList"
+ 14  from XML_Table
+ 15  ;
+
+BookID     Title                                   Price AuthorList
+---------- ----------------------------------- --------- --------------------------------------------------
+101        The Art Of SQL                          44.99 <bk_authors>
+                                                           <author>Faroult</author>
+                                                         </bk_authors>
+
+106        Alice in Oracle Land                    35.00 <bk_authors>
+                                                           <author>Dodgson</author>
+                                                           <author>Martin</author>
+                                                           <author>Carroll</author>
+                                                         </bk_authors>
+
+184        Birds of a Feather                      69.99 <bk_authors>
+                                                           <author>Heinrich</author>
+                                                         </bk_authors>
+
+188        Pricy                                  135.00 <bk_authors>
+                                                           <author>Martin</author>
+                                                         </bk_authors>
+
+
+4 rows selected.
+
+SQL> 
+SQL> /*  TASK 04 */
+SQL> with XML_Table as
+  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
+  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
+  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_price') as Price             , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
+  5          from xml_A13_books A14
+  6          where A14.OBJECT_VALUE.extract('//bk_authors').getStringVal() like '%>Martin<%')
+  7  select  BookID as "BookID"
+  8  , Title as "Title"
+  9  , AuthorList as "AuthorList"
+ 10  from XML_Table
+ 11  ;
+
+BookID     Title                               AuthorList
+---------- ----------------------------------- --------------------------------------------------
+102        Oracle SQL and SQL*Plus             <bk_authors>
+                                                 <author>Meyers</author>
+                                                 <author>Martin</author>
+                                                 <author>Merkel</author>
+                                               </bk_authors>
+
+106        Alice in Oracle Land                <bk_authors>
+                                                 <author>Dodgson</author>
+                                                 <author>Martin</author>
+                                                 <author>Carroll</author>
+                                               </bk_authors>
+
+103        XML Schema                          <bk_authors>
+                                                 <author>Martin</author>
+                                                 <author>Jones</author>
+                                               </bk_authors>
+
+115        Logic for Understanding Databases   <bk_authors>
+                                                 <author>Matters</author>
+                                                 <author>Poole</author>
+                                                 <author>Albertson</author>
+                                                 <author>Baker</author>
+                                                 <author>Cleaver</author>
+                                                 <author>Dawson</author>
+                                                 <author>Eldridge</author>
+                                                 <author>Martin</author>
+                                               </bk_authors>
+
+188        Pricy                               <bk_authors>
+                                                 <author>Martin</author>
+                                               </bk_authors>
+
+
+5 rows selected.
+
+SQL> 
+SQL> /*  TASK 05 */
+SQL> with XML_Table as
+  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
+  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
+  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_price') as Price
+  5          , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
+  6          from xml_A13_books A14
+  7          where A14.OBJECT_VALUE.extract('//author[1]/text()').getStringVal() = 'Martin')
+  8  select BookID as "BookID"
+  9  , Title as "Title"
+ 10  , AuthorList as "AuthorList"
+ 11  from XML_Table
+ 12  ;
+
+BookID     Title                               AuthorList
+---------- ----------------------------------- --------------------------------------------------
+103        XML Schema                          <bk_authors>
+                                                 <author>Martin</author>
+                                                 <author>Jones</author>
+                                               </bk_authors>
+
+188        Pricy                               <bk_authors>
+                                                 <author>Martin</author>
+                                               </bk_authors>
+
+
+2 rows selected.
+
+SQL> 
+SQL> /*  TASK 06 */
+SQL> with XML_Table as
+  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
+  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
+  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_price') as Price
+  5          , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
+  6          from xml_A13_books A14
+  7          where A14.OBJECT_VALUE.extract('//bk_authors').getStringVal() not like '%>Martin<%')
+  8  select BookID as "BookID"
+  9  , Title as "Title"
+ 10  , AuthorList as "AuthorList"
+ 11  from XML_Table
+ 12  ;
+
+BookID     Title                               AuthorList
+---------- ----------------------------------- --------------------------------------------------
+101        The Art Of SQL                      <bk_authors>
+                                                 <author>Faroult</author>
+                                               </bk_authors>
+
+110        Summer Cometh                       <bk_authors>
+                                                 <author>Dodgson</author>
+                                               </bk_authors>
+
+107        Crows and Ravens                    <bk_authors>
+                                                 <author>Poe</author>
+                                               </bk_authors>
+
+104        Programming with T-SQL              <bk_authors>
+                                                 <author>Walmsley</author>
+                                                 <author>Onofrei</author>
+                                                 <author>Wilson</author>
+                                                 <author>Ramos</author>
+                                               </bk_authors>
+
+105        Thinking in Sets                    <bk_authors>
+                                                 <author>Celko</author>
+                                               </bk_authors>
+
+184        Birds of a Feather                  <bk_authors>
+                                                 <author>Heinrich</author>
+                                               </bk_authors>
+
+108        T-SQL Programming                   <bk_authors>
+                                                 <author>Martindale</author>
+                                               </bk_authors>
+
+987        XML 15 the Textbook                 <bk_authors>
+                                                 <author>Albertson</author>
+                                                 <author>Baker</author>
+                                                 <author>Cleaver</author>
+                                                 <author>Dawson</author>
+                                                 <author>Eldridge</author>
+                                                 <author>Frank</author>
+                                                 <author>Gilbert</author>
+                                                 <author>Horne</author>
+                                                 <author>Ibsen</author>
+                                                 <author>Jacoby</author>
+                                                 <author>Franksen</author>
+                                                 <author>Gilbertson</author>
+                                                 <author>Hornesen</author>
+                                                 <author>Ibsensun</author>
+                                                 <author>Jacobysan</author>
+                                               </bk_authors>
+
+1010       Promises                            <bk_authors>
+                                                 <author/>
+                                               </bk_authors>
+
+1256       Priceless                           <bk_authors>
+                                                 <author>Remartin</author>
+                                               </bk_authors>
+
+
+10 rows selected.
+
+SQL> 
+SQL> /*  TASK 07 */
+SQL> with XML_Table as
+  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
+  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
+  4          , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
+  5          , (select count(*)
+  6             from table(xmlsequence(extract(A14.OBJECT_VALUE, '/book/bk_authors/author'))))
+  7             as NumberOfAuthors
+  8          from xml_A13_books A14)
+  9  select BookID as "BookID"
+ 10  , Title as "Title"
+ 11  from XML_Table
+ 12  where NumberOfAuthors between 4 and 10
+ 13  ;
+
+BookID     Title
+---------- -----------------------------------
+104        Programming with T-SQL
+115        Logic for Understanding Databases
+
+2 rows selected.
+
+SQL> 
+SQL> /*  TASK 08 */
+SQL> with XML_Table as
+  2          (select 1 as Grouping
+  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
+  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
+  5          , cast(extractvalue(A14.OBJECT_VALUE, '/book/bk_price') as number) as Price
+  6          from xml_A13_books A14)
+  7  select BookID as "BookID"
+  8  , Title as "Title"
+  9  , Price as "Price"
+ 10  , dense_rank() over (partition by Grouping order by nvl(Price, -1) desc) as "PRICERANK"
+ 11  from XML_Table
+ 12  ;
+
+BookID     Title                                   Price  PRICERANK
+---------- ----------------------------------- --------- ----------
+987        XML 15 the Textbook                    135.00          1
+188        Pricy                                  135.00          1
+184        Birds of a Feather                      69.99          2
+102        Oracle SQL and SQL*Plus                 65.00          3
+104        Programming with T-SQL                  50.00          4
+105        Thinking in Sets                        45.99          5
+101        The Art Of SQL                          44.99          6
+106        Alice in Oracle Land                    35.00          7
+108        T-SQL Programming                       29.95          8
+107        Crows and Ravens                        25.15          9
+103        XML Schema                              25.00         10
+115        Logic for Understanding Databases        5.00         11
+110        Summer Cometh                            0.00         12
+1010       Promises                                              13
+1256       Priceless                                             13
+
+15 rows selected.
+
+SQL> 
+SQL> /*  TASK 09 */
+SQL> with XML_Table as
+  2          (select extractvalue(OBJECT_VALUE, '/book/bk_subject') as Subject
+  3          , cast(extractvalue(OBJECT_VALUE, '/book/bk_price') as number) as Price
+  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
+  5          from xml_A13_books A14)
+  6          , TMP as(select Subject
+  7                          , nvl(avg(Price), 0.00) as AvgPrice
+  8                          , count(BookID) as NumberBooks
+  9                          from XML_Table
+ 10                          group by Subject)
+ 11          (select Subject as "Subject"
+ 12          , NumberBooks as "Number Books"
+ 13          , to_char(AvgPrice, '9,990.00') as "Avg Price"
+ 14  from TMP)
+ 15  union all
+ 16  (select 'SUMMARY' as "Subject"
+ 17  , sum(NumberBooks) as "Number Books"
+ 18  , to_char(avg(AvgPrice), '9,990.00') as "Avg Price"
+ 19  from TMP)
+ 20  ;
+
+Subject         Number Books Avg Price
+--------------- ------------ ---------
+Fiction                    6     51.66
+Tech                       4     37.49
+XML                        1    135.00
+Science                    2     25.15
+SQL                        1     45.99
+Fantasy                    1      0.00
+SUMMARY                   15     49.22
+
+7 rows selected.
+
+SQL> 
+SQL> /*  TASK 10 */
+SQL> with XML_Table as
+  2          (select extractvalue(OBJECT_VALUE, '/book/bk_subject') as Subject
+  3          , cast(extractvalue(OBJECT_VALUE, '/book/bk_price') as number) as Price
+  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
+  5          from xml_A13_books A14)
+  6  , TMP as
+  7          (select Subject
+  8          , nvl(avg(Price), 0.00) as AvgPrice
+  9          from XML_Table
+ 10          group by Subject)
+ 11  select (
+ 12    select to_char(avg(AvgPrice), '999,999,999.99')
+ 13    from TMP
+ 14    where subject = 'SQL') as "AvgPrice_SQL"
+ 15  , (select to_char(avg(AvgPrice), '999,999,999.99')
+ 16  from TMP
+ 17  where Subject != 'SQL') as "AvgPrice_Other"
+ 18  from dual
+ 19  ;
+
+AvgPrice_SQL    AvgPrice_Other
+--------------- ---------------
+          45.99           49.86
+
+1 row selected.
+
+SQL> 
+SQL> spool off
