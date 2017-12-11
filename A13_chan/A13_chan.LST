@@ -77,7 +77,7 @@ SQL> with XML_Table as
  10  , cast(Price as number) as "Price"
  11  , AuthorList as "AuthorList"
  12  from XML_Table
- 13  where Price >= 30
+ 13  where Price > 30
  14  and Subject = 'Fiction'
  15  ;
 

@@ -48,7 +48,7 @@ select BookID as "BookID"
 , cast(Price as number) as "Price"
 , AuthorList as "AuthorList"
 from XML_Table
-where Price >= 30 
+where Price > 30 
 and Subject = 'Fiction'
 ;
 
