@@ -1,0 +1,69 @@
+Assignment Tasks 1.1
+
+Task 01 
+
+Copy and run the following two SQL statements. The first will remove any rows from the zoo_2016 table
+
+where the z_id value is greater than 100 and the second will show the rows in the table. At this point you should have the original rows that I supplied in the script. The rows I provided in the inserts script have a z_id value less than 100 and will not be deleted.
+
+delete 
+
+from zoo_2016 
+
+where z_id > 100;
+
+ 
+
+select * 
+
+from zoo_2016;
+
+ 
+
+Task 02
+
+(3 insert statements) Add an additional 3 rows to the table. For the animal id, use an animal id value that is greater than 100. For the rest of the data, use any data values you want.
+
+Assignment Tasks 1.2
+
+Task 01
+
+(6 insert statements) Copy and run at least 6 good insert commands from the Canvas discussion Assignment 01.01 which you recently completed. The more rows you have in your table, the better for experimenting with it. You cannot complete this step until some other people have already done their inserts.
+
+Task 02
+
+Copy and run the following SQL statement. It will display the rows in the table.
+
+select z_id, z_name, z_type, z_cost, z_dob, z_acquired
+
+from zoo_2016;
+
+ 
+
+Task 03
+
+Write and run the SQL statement so that it shows only three columns:  the type of animal in the first column, the animal's name in the second column and the cost in the third column.  Sort the rows by the animal type with a secondary sort on the name. (I am sure you can figure out how to do this.) 
+
+Task 04
+
+We want to see the id, name and date of birth of all of the zebras in the table. Display the id of animal in the first column, the animal's name in the second column and the date of birth in the third column. Sort by the date of birth with the youngest animals displayed first.
+
+ 
+
+For the last tasks, I am asking you to display some data about your tables. The other queries asked you to show data that is in your table.  It is OK if you do not fully understand these queries. 
+
+ 
+
+Task 05
+
+Give the following command which shows the names of your tables.
+
+select tname from tab;
+
+ 
+
+Task 06
+
+Give the following command which shows some information about the table columns.
+
+desc zoo_2016

@@ -1,0 +1,94 @@
+General Directions
+
+Use the books tables.
+
+These tasks focus on the use of Subqueries. Consequently, you must use subqueries to solve the problems. In many cases you could solve the task without the use of subqueries- but that will not earn any credit for the assignment.
+
+The following rules must be followed.
+
+    You must do each task with a single query. The query will have sub components but it will be a single query.
+    Do not use an inner, outer or full join. Do not use a comma join.
+    You may use a correlated subquery; with a correlated subquery there will be a join between a table in a subquery and a table in an outer query with the join condition being expressed in the Where clause. This does not mean that you can use joins in general- only the join used to create a correlated subquery.
+    Do not use any views.
+    Do not use set operations (Union, Intersect, etc)
+    You may use a CTE, since that is actually a subquery.
+    Do not use a variable except for assignment of a simple literal.
+    You may not use ranking functions ( we use them in a future unit)
+    If you use column aliases, then use different column aliases in each subquery. Using the same column alias may be legit but it makes your query very hard to read.
+    Do not hard code a literal for the current year, the last year etc. Use the system date to calculate the date value needed.
+    If you are testing a date or datetime column, use temporal functions. Do not use wildcards for testing dates.
+    Use only the data supplied in the task to write the query and do not make assumption about the data that are not supported by the create table statements.
+    If a task asks you to display the 'largest', "fewest' etc, display any ties for that position.
+    A book with an order quantity of 0 is still considered a book that is ordered
+    An order header without any detail lines is still an order.
+
+The tasks which require an Exists operator can also use a Not Exists operator. If the task says to use an Exists query and you do not use Exists in a meaningful way, you will get no points for that task.
+
+These queries will not have duplicate rows in the result set.
+Assignment Tasks
+
+Task 01
+
+For each customer in the customers table who lives in New Jersey (NJ) or in Massachusetts (MA), display their id, their last name and the number of orders they have. Display 0 if the customer has no orders. Sort by the customer id.
+
+Cust_ID Cust_Name_Last       Number Of Orders
+------- -------------------- ----------------
+300124  Adams                              21
+300150  Jobs                                1
+300153  Jones                               0
+300264  Jones                             123
+
+Task 02
+
+Display the book id and title for each book which has been ordered at least once and the list price of the book is more than twice the average list price of all books.
+
+Task 03
+
+We want to know how many orders we had in each quarter of the previous year. Display the data in one row as shown here and include a column for all orders in the previous year.
+
+       Qrt1        Qrt2        Qrt3        Qrt4 AllQuarters
+----------- ----------- ----------- ----------- -----------
+        140          95         120         213         568
+
+Task 04
+
+Use an Exists query to display the customer id and last name for any customer who ordered a book in each (every one) of the first three months of the current year. Sort by the customer id. (The first three months of any year are always Jan, Feb, Mar- so you can hard code the months.)
+
+Task 05
+
+Use an Exists query to display the author information for authors who have more than one book but for whom we have no book sales. Sort by the author id.
+
+AUTHOR_NAME_FIRST    AUTHOR_NAME_LAST     AUTHOR_ID
+-------------------- -------------------- ---------
+Mark                 Gersten              G1234
+Sue                  Haldeson             H9876
+
+Task 06
+
+We want to find any books which cover exactly two of the different sql systems using the topic ids 'SSRV', 'ORA', 'MYSQL'
+For example, the book could have a topic of SSRV and a topic of ORA, but not MYSQL. Any two of these topics is sufficient to pass our filter. Display the id and title of the book(s) that are meet this test.
+
+Task 07
+
+For each order placed in the first three months of the previous year, display the following pieces of data:
+
+    order date
+    order id
+    customer id
+    customer last name - use an alias of customer
+    total number of books purchased ( quantity) on that order- use an alias of NumberBooks
+    total amount due for that order - use an alias of OrderCost
+
+Sort the result by the order date.(Suggestion- use the order headers table in the From clause of the main query.) Remember you are not allowed to use joins other than that required for a correlated subquery.
+
+Task 08
+
+Display the customer id and last name for customers with at least three and no more than five orders last year. Sort by the customer id.
+
+Task 09
+
+Display the customer id and last name of the customer with the most orders in the previous year.
+
+Task 10
+
+Display the cust id and last name of customers who had the same or more orders in the first quarter of last year than they had in the first quarter of the current year. Count the order id values for this comparison. This will include only customers who have any orders in those two time periods. Sort by the customer id.

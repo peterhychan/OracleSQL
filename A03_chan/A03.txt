@@ -1,0 +1,141 @@
+There are some specific rules for this assignment. 
+
+    Each query uses only a single table
+    If a task uses the English word "between"- it is the inclusive SQL key word Between.
+    Because I want you to focus on the use of specific operators, for this assignment you may use only the following operators in the Where clause.
+        Is Null
+        Is Not Null
+        In (list)
+        Not In (list)
+        Between exp1 And exp2
+        Direction comparisons: =, !=,  >,   >=,   <,   <=
+
+Specifically you may not use the Like operator or logical operators. If you use any of those operators in a query, you will receive no points for that task.
+
+    Do not use the Group by clause; we have not yet discussed this in the notes.
+    Remember, if a sample display is provided, use that to determine the column order and column aliases to use in your result set. The sample data will not generally match the data in your tables. Do not try to match the column widths of the sample displays shown here.
+
+ 
+Assignment Tasks
+
+Task 01
+
+The vet wants a list of all of the different places where our clients live.  Display the different postal codes, cities and states for our clients who live in California or Nevada.
+
+This is a single column. Format the column as shown here; there is a colon and a space after the postal code and a space after the city.
+
+Location
+
+------------------------------------------
+
+59006: Carson City CA
+
+51555: Desparado CA
+
+51579: Sunny Valley CA
+
+ 
+
+Task 02
+
+Show the client first and last name and phone number; skip all clients who do not have a value for the phone number. The display should be sorted by the client id. 
+
+Task 03
+
+Display the service id of any services that were actually used(charged for) on  an exam which were charged at a fee of $75 or more. Display each service id only once.
+
+Task 04
+
+Display the full name ( first name and last name in one column), the id, and job title of all staff who do not have a job title of vet or vet assnt. This is three columns.  See the sample run.
+
+STAFF                         STF_ID STF_JOB_TITLE
+
+------------------------- ---------- -------------------------
+
+Shirley Horn                      20 clerical
+
+Stan Turrentine                  101 kennel
+
+ 
+
+Task 05
+
+The vet wants to consider increasing the list price for all services except office visits by 15 %. Display the service id, service, type, description, list price and proposed price for all services (other than office visits).  Use the column aliases displayed in the sample result set. Sort by the service id. 
+
+Service ID  Service Type     Description                Curr Price     Incr Price
+
+----------- ---------------- ----------------------- ------------- --------------
+
+        225 medicine         Feline PCR Series                  75          86.25
+
+        551 medicine         First Feline PCR                 35.5         40.825
+
+        612 medicine         Buprenex oral drops 1 ml        25.91        29.7965
+
+        625 treatment        CBC and scan                      155         178.25
+
+ 
+
+Task 06
+
+Display the client id, the animal id and the animal name for rodents. Sort by the client id with the animal id as the second sort key.
+
+      CL_ID       AN_ID AN_NAME
+
+----------- ----------- -------------------------
+
+       1825       51021 Koshka
+
+       1825       51022 Koshka
+
+       1825       56011 Fritz
+
+       3560       52734 Gutsy 
+
+ 
+
+Task 07
+
+The vet wants a list of client ids for clients who have one or more reptiles. Display the client id and the animal type for these clients. The vet does not care how many animals the clients have, only the client id and types. Sort by the client id.
+
+      CL_ID AN_TYPE
+
+----------- -------------------------
+
+       5534 snake
+
+       5699 chelonian
+
+       5699 lizard
+
+       5699 snake
+
+       5852 snake
+
+ 
+
+Task 08
+
+Display the client id, animal id, name, and the date of birth for each animal that is neither a rodent nor a reptile. Sort the rows by the date of birth with the youngest animals first.  
+
+For a query like this, you might want to display the animal type while you build and test it; but for the version you turn in for grading, show only the columns indicated.
+
+     CL_ID      AN_ID AN_NAME                   AN_DOB
+
+---------- ---------- ------------------------- ---------
+
+      5689      21205 Manfried                  30-MAR-15
+
+      1825      16043 Ursula                    06-JUN-14
+
+      1825      16044 Triton                    06-JUN-14
+
+      1852      21321 Morton                    03-JUN-14
+
+      1825      16003 Ursula                    06-FEB-13
+
+       411      21001 Yoggie                    22-JAN-13
+
+      1852      21318 Waldrom                   11-JUN-12
+
+      1852      21315 Baldric                   11-JUN-12 

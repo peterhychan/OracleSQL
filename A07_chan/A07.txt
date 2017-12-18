@@ -1,0 +1,41 @@
+This assignment uses the tables from the vets database.
+
+The goal of the assignment is to give you more experience working with subqueries and identifying certain SQL patterns. The midterm exam will include tasks such as these. Therefore, you should use subqueries even where a join will also work (but keep in mind you may have joins in your subqueries).
+
+The first two queries are basic queries that you can use to help check your other query results. You cannot prove that a query is logically correct by looking at the output but you can sometimes tell that a query is wrong that way. For example- look at task 03 - we want clients with an animal that is not a reptile. Suppose your query for task 03 brings back a client id 2000. You can look at the rows in Task 01 to see the animals client 2000 has.
+
+Do not display duplicate rows; but think carefully about this and do not use Distinct if it is not required by the logic of the query.
+
+Do  not give me two queries for any one task.
+
+Task 01
+
+Display all clients and their animals if they have any. Display the following: client id, client last name, animal id, animal type, and animal name. You can just display the default nulls for missing data.
+
+Task 02
+
+Display all animals and their exam information if they have any exams. Display the following: animal id, animal type, and animal name, exam id, the year of the exam date, and the service id for any services on the exam. You can just display the default nulls for missing data.
+
+Task 03
+
+Display the client id and last name for each client who has at least one animal that is not a reptile.
+
+Task 04
+
+Display the client id and client last name for each client who owns a dog and owns a reptile.
+
+Task 05
+
+Display the client id and client last name for each client who owns a dog and does not own a reptile.
+
+Task 06
+
+Display the animal id and animal name for all animals that have had an exam but have not had an exam that included  a routine exam service. Test for that using the service id values: (104,105,106,108)
+
+Task 07
+
+Display the id and name and type of any animal and the client id for the associated client for that animal where the animal has had at least one exam in the year 2015 and at least one exam in the year 2016.
+
+Task 08
+
+Display the id and name and type of any reptile and the client id for the associated client for that animal where the animal has had at least one exam in the previous year but has no exams in the current year.  Do not hard code the current year.

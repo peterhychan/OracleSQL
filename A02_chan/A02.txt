@@ -1,0 +1,90 @@
+Please Note: The sample display does not always show the data in your current tables.
+
+Task 01
+
+For each row in the staff table, display the first name and last name of each staff person and their job title.
+
+STF_NAME_FIRST            STF_NAME_LAST             STF_JOB_TITLE
+
+------------------------- ------------------------- ----------------
+
+Marcin                    Wasilewski                vet
+
+Eliza                     Dolittle                  vet
+
+Shirley                   Horn                      clerical
+
+Task 02
+
+Display the animal id with a column alias of "ID", the animal name with a column alias of "Name", the animal type with the column alias "Animal Type", and the birth date with a column alias of "BirthDate" for each animal. Display the data with the oldest animals first.  
+
+       ID  Name                      Animal Type               BirthDate
+
+---------- ------------------------- ------------------------- ---------
+
+     12035 Mr Peanut                 bird                      28-FEB-95
+
+     15401 Pinkie                    lizard                    15-MAR-98
+
+     21002 Edger                     hedgehog                  02-OCT-02
+
+     21003 Calvin Coolidge           dog                       18-JUN-04
+
+     11029                           bird                      01-OCT-05
+
+     15165 Burgess                   dog                       20-NOV-05
+
+
+Task 03
+
+The vet wants to see a list of the different types of animals we currently have registered with the clinic. Display the animal types from the animals table. Suppress any duplicates.
+
+Task 04
+
+For each row in the services table, display the service type and description. The rows should be sorted by the service type and list price. 
+
+Task 05
+
+Display the exam id, the service id, and the fee charged for each service performed on an exam. Order by the exam id and then by the fee.(Don't forget to use the aliases shown in the sample display.)
+
+   EXAM_ID    SERVICE FEE_CHARGED
+
+---------- ---------- -----------
+
+      3001        104          25
+
+      3010        104          25
+
+      3010        605         535
+
+      3104        613          47
+
+      3104        106          75 
+
+Task 06
+
+Display the animal name and animal type and animal date of birth values from the animals table. Suppress any duplicates. Sort the display in order by the type as the first sort key and the name as the second sort key.
+
+Task 07
+
+For each exam, display the animal id, the exam date and the id of the staff person who did the exam. Display the rows in order by the staff id; use the exam date as the second sort key with the earlier exams first. Use the data in the exam headers table. (Don't forget to use the aliases shown in the sample display.)
+
+ 
+
+    Animal Exam Date      Staff
+
+---------- --------- ----------
+
+     15401 06-NOV-14         15
+
+     17027 06-NOV-14         15
+
+     16003 10-NOV-14         15
+
+     19845 22-NOV-14         15
+
+     21001 23-NOV-14         15
+
+Task 08
+
+The vet wants a list of the different locations for the clients. For this task, the term location refers to the city and state. The display will include the client state in the first column and city in the second column and will not include duplicate rows. Sort the result set by state and city.

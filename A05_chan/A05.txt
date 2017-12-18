@@ -1,0 +1,86 @@
+General Directions
+
+This assignment uses the tables in the vets set of tables. Several of these task require the use of specific functions or techniques.
+Assignment Tasks
+
+Task 01
+
+For each client in the clients table, display their id, last name, first name, and phone number. If the first name is missing, use a zero-length -string (ZLS) instead; if the phone number is missing, display the message "No phone number"
+
+     CL_ID CL_NAME_LAST              CL_NAME_FIRST             CL_PHONE
+---------- ------------------------- ------------------------- ---------------
+      4534 Montgomery                Wes                       No phone number
+      3560 Monk                      Theo                      212.582.6245
+      3423 Hawkins                   Coleman                   937.258.5645
+      1825 Harris                    Eddie                     No phone number
+      5689 Biederbecke                                         415.239.6945
+
+Do this one time using the coalesce function and a second time using another function to handle the missing data.
+
+Task 02
+
+The vet wants a list of all of the clients showing the client id, name, and phone number in a single column. The format for this column must follow the rules given here:
+The id is displayed first followed by a single blank
+Next is the name in the format last name, comma, space, first name, colon
+    If the first name is missing then display only the last name and do not display a comma
+Following is the phone number.
+    If the phone number is missing then display the message No phone.  If there is a phone number display the word Phone followed by a colon and a space and then the phone number.
+For example:
+
+CLIENT
+-------------------------------------------
+254 Boston, Edger: No phone
+411 Carter, James: Phone: 510.258.4546
+1825 Harris: No phone
+1852 Dalrymple: Phone: 701.328.2725
+
+Task 03
+
+For each row in the services table where the service id is between 500 and 599, display the service id, the list price, the list price rounded to the near 10 dollars and the list price rounded up to the dollar. Use the math functions for the calculations and use the To_char function for formatting to display these three columns with 2 digits after the decimal place.
+
+    SRV_ID PRICE    TO_TENS  UPTO_DLR
+---------- -------- -------- --------
+       501    50.00    50.00    50.00
+       502    46.99    50.00    47.00
+       504    62.12    60.00    63.00
+       505    88.25    90.00    89.00
+
+Task 04
+
+Display all services which include the word ''Dental ' but not 'Feline' in their description. Display all of the columns in the services table for the matches. Do not use the LIKE operator for this.
+
+Task 05
+
+Display the ex dates for the exam headers table in the 4 following formats. Limit the output to 10 rows by using the where clause Where rownum <= 10.  Do NOT sort the result set. Include the ex_id as shown.
+
+     EX_ID EXAMDATE1 EXAMDATE2  EXAMDATE3    EXAMDATE4
+---------- --------- ---------- ------------ ------------------
+      3105 10-OCT-14 2014-10-10 OCT 10, 2014 October 10, 2014
+      3552 10-NOV-14 2014-11-10 NOV 10, 2014 November 10, 2014
+      4243 08-JUN-15 2015-06-08 JUN 08, 2015 June 8, 2015
+      4514 10-AUG-15 2015-08-10 AUG 10, 2015 August 10, 2015
+
+Task 06
+
+Display the id and name of any animal that had an exam in the first 6 months of the year 2015.
+
+Task 07
+
+Display the id and name of any animal who had an exam in the previous month. For this query, a "previous" month is defined as the entire month before the current month.  If the current month were November 2013, the previous month would be October, 2013.
+You are not allowed to hard code any part of the current date. That means you cannot use literals  such as 2016, 2015,2,3,4
+
+Task 08
+
+Display the id, name, and exam date of any animal who had an exam on the last day of the month.
+
+Task 09
+
+    Declare a numeric variable and generate a random integer between 10 and 25 inclusive and assign it to the variable.
+    Display the variable with a select query.
+    Then use the variable to display that many rows from the exam details table; display the exam id, the service id and the fee charged. ( Use the rownum keyword as in task 05.)  For example, if the random number generated is 12, your query will display 12 rows.
+
+For the assignment script, run this only once. As you test this, run it several times; you should get a different number of rows displayed for most runs.
+
+Task 10
+
+For each animal in the animals table, display the animal id, the animal type and the animal category. The category is determined by the following rules. If the animal is a reptile, the category is Reptile; if the animal is a rodent, the category is Rodent; if the animal is a cat or a dog, the category is Cat/Dog. All other animal types use the an_type as the category.
