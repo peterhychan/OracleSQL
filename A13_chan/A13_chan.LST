@@ -147,178 +147,113 @@ BookID     Title                                   Price AuthorList
 
 SQL> 
 SQL> /*  TASK 04 */
-SQL> with XML_Table as
-  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
-  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
-  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_price') as Price             , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
-  5          from xml_A13_books A14
-  6          where A14.OBJECT_VALUE.extract('//bk_authors').getStringVal() like '%>Martin<%')
-  7  select  BookID as "BookID"
-  8  , Title as "Title"
-  9  , AuthorList as "AuthorList"
- 10  from XML_Table
- 11  ;
+SQL> select
+  2    extractvalue(object_value, '//bk_id') "BookID"
+  3  , extractvalue(object_value, '//bk_title') "Title"
+  4  , extract(object_value, '//author') "AuthorList"
+  5  from xml_A13_books
+  6  where existsNode(object_value, '//bk_authors[author="Martin"]')=1;
 
 BookID     Title                               AuthorList
 ---------- ----------------------------------- --------------------------------------------------
-102        Oracle SQL and SQL*Plus             <bk_authors>
-                                                 <author>Meyers</author>
-                                                 <author>Martin</author>
-                                                 <author>Merkel</author>
-                                               </bk_authors>
+102        Oracle SQL and SQL*Plus             <author>Meyers</author>
+                                               <author>Martin</author>
+                                               <author>Merkel</author>
 
-106        Alice in Oracle Land                <bk_authors>
-                                                 <author>Dodgson</author>
-                                                 <author>Martin</author>
-                                                 <author>Carroll</author>
-                                               </bk_authors>
+106        Alice in Oracle Land                <author>Dodgson</author>
+                                               <author>Martin</author>
+                                               <author>Carroll</author>
 
-103        XML Schema                          <bk_authors>
-                                                 <author>Martin</author>
-                                                 <author>Jones</author>
-                                               </bk_authors>
+103        XML Schema                          <author>Martin</author>
+                                               <author>Jones</author>
 
-115        Logic for Understanding Databases   <bk_authors>
-                                                 <author>Matters</author>
-                                                 <author>Poole</author>
-                                                 <author>Albertson</author>
-                                                 <author>Baker</author>
-                                                 <author>Cleaver</author>
-                                                 <author>Dawson</author>
-                                                 <author>Eldridge</author>
-                                                 <author>Martin</author>
-                                               </bk_authors>
+115        Logic for Understanding Databases   <author>Matters</author>
+                                               <author>Poole</author>
+                                               <author>Albertson</author>
+                                               <author>Baker</author>
+                                               <author>Cleaver</author>
+                                               <author>Dawson</author>
+                                               <author>Eldridge</author>
+                                               <author>Martin</author>
 
-188        Pricy                               <bk_authors>
-                                                 <author>Martin</author>
-                                               </bk_authors>
-
+188        Pricy                               <author>Martin</author>
 
 5 rows selected.
 
 SQL> 
 SQL> /*  TASK 05 */
-SQL> with XML_Table as
-  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
-  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
-  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_price') as Price
-  5          , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
-  6          from xml_A13_books A14
-  7          where A14.OBJECT_VALUE.extract('//author[1]/text()').getStringVal() = 'Martin')
-  8  select BookID as "BookID"
-  9  , Title as "Title"
- 10  , AuthorList as "AuthorList"
- 11  from XML_Table
- 12  ;
+SQL> select
+  2    extractvalue(object_value, '//bk_id') "BookID"
+  3  , extractvalue(object_value, '//bk_title') "Title"
+  4  , extract(object_value, '//author') "AuthorList"
+  5  from xml_A13_books
+  6  where extractvalue(object_value, '//author[1]') = 'Martin';
 
 BookID     Title                               AuthorList
 ---------- ----------------------------------- --------------------------------------------------
-103        XML Schema                          <bk_authors>
-                                                 <author>Martin</author>
-                                                 <author>Jones</author>
-                                               </bk_authors>
+103        XML Schema                          <author>Martin</author>
+                                               <author>Jones</author>
 
-188        Pricy                               <bk_authors>
-                                                 <author>Martin</author>
-                                               </bk_authors>
-
+188        Pricy                               <author>Martin</author>
 
 2 rows selected.
 
+
 SQL> 
 SQL> /*  TASK 06 */
-SQL> with XML_Table as
-  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
-  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
-  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_price') as Price
-  5          , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
-  6          from xml_A13_books A14
-  7          where A14.OBJECT_VALUE.extract('//bk_authors').getStringVal() not like '%>Martin<%')
-  8  select BookID as "BookID"
-  9  , Title as "Title"
- 10  , AuthorList as "AuthorList"
- 11  from XML_Table
- 12  ;
+SQL> /*  TASK 06 */
+SQL> select
+  2    extractvalue(object_value, '//bk_id') "BookID"
+  3  , extractvalue(object_value, '//bk_title') "Title"
+  4  , extract(object_value, '//author') "AuthorList"
+  5  from xml_A13_books
+  6  where existsNode(object_value, '//bk_authors[author="Martin"]')=0;
 
 BookID     Title                               AuthorList
 ---------- ----------------------------------- --------------------------------------------------
-101        The Art Of SQL                      <bk_authors>
-                                                 <author>Faroult</author>
-                                               </bk_authors>
+101        The Art Of SQL                      <author>Faroult</author>
+110        Summer Cometh                       <author>Dodgson</author>
+107        Crows and Ravens                    <author>Poe</author>
+104        Programming with T-SQL              <author>Walmsley</author>
+                                               <author>Onofrei</author>
+                                               <author>Wilson</author>
+                                               <author>Ramos</author>
 
-110        Summer Cometh                       <bk_authors>
-                                                 <author>Dodgson</author>
-                                               </bk_authors>
+105        Thinking in Sets                    <author>Celko</author>
+184        Birds of a Feather                  <author>Heinrich</author>
+108        T-SQL Programming                   <author>Martindale</author>
+987        XML 15 the Textbook                 <author>Albertson</author>
+                                               <author>Baker</author>
+                                               <author>Cleaver</author>
+                                               <author>Dawson</author>
+                                               <author>Eldridge</author>
+                                               <author>Frank</author>
+                                               <author>Gilbert</author>
+                                               <author>Horne</author>
+                                               <author>Ibsen</author>
+                                               <author>Jacoby</author>
+                                               <author>Franksen</author>
+                                               <author>Gilbertson</author>
+                                               <author>Hornesen</author>
+                                               <author>Ibsensun</author>
+                                               <author>Jacobysan</author>
 
-107        Crows and Ravens                    <bk_authors>
-                                                 <author>Poe</author>
-                                               </bk_authors>
-
-104        Programming with T-SQL              <bk_authors>
-                                                 <author>Walmsley</author>
-                                                 <author>Onofrei</author>
-                                                 <author>Wilson</author>
-                                                 <author>Ramos</author>
-                                               </bk_authors>
-
-105        Thinking in Sets                    <bk_authors>
-                                                 <author>Celko</author>
-                                               </bk_authors>
-
-184        Birds of a Feather                  <bk_authors>
-                                                 <author>Heinrich</author>
-                                               </bk_authors>
-
-108        T-SQL Programming                   <bk_authors>
-                                                 <author>Martindale</author>
-                                               </bk_authors>
-
-987        XML 15 the Textbook                 <bk_authors>
-                                                 <author>Albertson</author>
-                                                 <author>Baker</author>
-                                                 <author>Cleaver</author>
-                                                 <author>Dawson</author>
-                                                 <author>Eldridge</author>
-                                                 <author>Frank</author>
-                                                 <author>Gilbert</author>
-                                                 <author>Horne</author>
-                                                 <author>Ibsen</author>
-                                                 <author>Jacoby</author>
-                                                 <author>Franksen</author>
-                                                 <author>Gilbertson</author>
-                                                 <author>Hornesen</author>
-                                                 <author>Ibsensun</author>
-                                                 <author>Jacobysan</author>
-                                               </bk_authors>
-
-1010       Promises                            <bk_authors>
-                                                 <author/>
-                                               </bk_authors>
-
-1256       Priceless                           <bk_authors>
-                                                 <author>Remartin</author>
-                                               </bk_authors>
-
+1010       Promises                            <author/>
+1256       Priceless                           <author>Remartin</author>
 
 10 rows selected.
 
 SQL> 
 SQL> /*  TASK 07 */
-SQL> with XML_Table as
-  2          (select extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
-  3          , extractvalue(A14.OBJECT_VALUE, '/book/bk_title') as Title
-  4          , extract(A14.OBJECT_VALUE, '/book/bk_authors') as AuthorList
-  5          , (select count(*)
-  6             from table(xmlsequence(extract(A14.OBJECT_VALUE, '/book/bk_authors/author'))))
-  7             as NumberOfAuthors
-  8          from xml_A13_books A14)
-  9  select BookID as "BookID"
- 10  , Title as "Title"
- 11  from XML_Table
- 12  where NumberOfAuthors between 4 and 10
- 13  ;
+SQL> select
+  2    extractvalue(object_value, '//bk_id') BookID
+  3  , extractvalue(object_value, '//bk_title') Title
+  4  from xml_A13_books
+  5  where existsNode(object_value, '//author[4]')=1    --- at least 4 authors
+  6  and   existsNode(object_value, '//author[11]')=0   --- no more than 10 authors
+  7  ;
 
-BookID     Title
+BOOKID     TITLE
 ---------- -----------------------------------
 104        Programming with T-SQL
 115        Logic for Understanding Databases
@@ -362,64 +297,54 @@ BookID     Title                                   Price  PRICERANK
 
 SQL> 
 SQL> /*  TASK 09 */
-SQL> with XML_Table as
-  2          (select extractvalue(OBJECT_VALUE, '/book/bk_subject') as Subject
-  3          , cast(extractvalue(OBJECT_VALUE, '/book/bk_price') as number) as Price
-  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
-  5          from xml_A13_books A14)
-  6          , TMP as(select Subject
-  7                          , nvl(avg(Price), 0.00) as AvgPrice
-  8                          , count(BookID) as NumberBooks
-  9                          from XML_Table
- 10                          group by Subject)
- 11          (select Subject as "Subject"
- 12          , NumberBooks as "Number Books"
- 13          , to_char(AvgPrice, '9,990.00') as "Avg Price"
- 14  from TMP)
- 15  union all
- 16  (select 'SUMMARY' as "Subject"
- 17  , sum(NumberBooks) as "Number Books"
- 18  , to_char(avg(AvgPrice), '9,990.00') as "Avg Price"
- 19  from TMP)
- 20  ;
+SQL> column "Avg Price" format 9,999.99
+SQL> 
+SQL> select
+  2    nvl(subject, 'SUMMARY') "Subject"
+  3  , round(avg(price),2) "Avg Price"
+  4  , count(*) "Number Books"
+  5  from(
+  6    select
+  7      extractvalue(object_value, '//bk_subject') Subject
+  8    , extractvalue(object_value, '//bk_price') Price
+  9    from xml_A13_books
+ 10  )
+ 11  group by rollup(subject);
 
-Subject         Number Books Avg Price
---------------- ------------ ---------
-Fiction                    6     51.66
-Tech                       4     37.49
-XML                        1    135.00
-Science                    2     25.15
-SQL                        1     45.99
-Fantasy                    1      0.00
-SUMMARY                   15     49.22
+Subject         Avg Price Number Books
+--------------- --------- ------------
+Fantasy                              1
+Fiction             51.66            6
+SQL                 45.99            1
+Science             25.15            2
+Tech                37.49            4
+XML                135.00            1
+SUMMARY             51.24           15
 
 7 rows selected.
 
+
+
+
+SQL> 
 SQL> 
 SQL> /*  TASK 10 */
-SQL> with XML_Table as
-  2          (select extractvalue(OBJECT_VALUE, '/book/bk_subject') as Subject
-  3          , cast(extractvalue(OBJECT_VALUE, '/book/bk_price') as number) as Price
-  4          , extractvalue(A14.OBJECT_VALUE, '/book/bk_id') as BookID
-  5          from xml_A13_books A14)
-  6  , TMP as
-  7          (select Subject
-  8          , nvl(avg(Price), 0.00) as AvgPrice
-  9          from XML_Table
- 10          group by Subject)
- 11  select (
- 12    select to_char(avg(AvgPrice), '999,999,999.99')
- 13    from TMP
- 14    where subject = 'SQL') as "AvgPrice_SQL"
- 15  , (select to_char(avg(AvgPrice), '999,999,999.99')
- 16  from TMP
- 17  where Subject != 'SQL') as "AvgPrice_Other"
- 18  from dual
- 19  ;
+SQL> select
+  2    round(avg(
+  3      case when subject='SQL' then price end ), 2) "AvgPrice_SQL"
+  4  , round(avg(
+  5      case when subject!='SQL' then price end ), 2) "AvgPrice_Other"
+  6  from(
+  7    select
+  8      extractvalue(object_value, '//bk_subject') Subject
+  9    , extractvalue(object_value, '//bk_price') Price
+ 10    from xml_A13_books
+ 11  );
 
-AvgPrice_SQL    AvgPrice_Other
---------------- ---------------
-          45.99           49.86
+
+AvgPrice_SQL AvgPrice_Other
+------------ --------------
+       45.99          51.67
 
 1 row selected.
 
